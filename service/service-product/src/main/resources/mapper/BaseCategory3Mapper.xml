@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arzhu.sph_gmall.product.mapper.BaseCategory3Mapper">
+<!--     List selectByCategory2Id(@Param("category2Id") Integer category2Id); -->
+    <select id="selectByCategory2Id" resultType="com.arzhu.sph_gmall.model.product.BaseCategory3">
+        SELECT * FROM base_category3 WHERE category2_id = #{category2Id}
+    </select>
+</mapper>

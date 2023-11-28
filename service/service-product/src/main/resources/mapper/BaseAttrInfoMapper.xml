@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arzhu.sph_gmall.product.mapper.BaseAttrInfoMapper">
+<!--    List<BaseAttrInfo> selectAttrInfoList(@Param("category1Id") Integer category1Id,-->
+    <resultMap id="baseAttrInfoMap" type="com.arzhu.sph_gmall.model.product.BaseAttrInfo">
+        <id column="id" property="id"></id>
+        <result column="attr_name" property="attrName"></result>
+        <result column="category_id" property="categoryId"></result>
+        <result column="category_level" property="categoryLevel"></result>
+        <collection property="attrValueList" ofType="com.arzhu.sph_gmall.model.product.BaseAttrValue">
+            <id column="value_id" property="id"></id>
+            <result column="value_name" property="valueName"></result>
+            <result column="attr_id" property="attrId"></result>
+        </collection>
+    </resultMap>
+    <select id="selectAttrInfoList" resultMap="baseAttrInfoMap">
+        SELECT bai.id,bai.category_id,
+               bai.category_level,bai.attr_name attr_name,
+               bav.value_name,bav.id value_id,bav.attr_id attr_id
+        FROM base_attr_info bai
+        JOIN base_attr_value bav ON bai.id = bav.attr_id
+        <where>
+            (bai.is_deleted = 0 and bav.is_deleted = 0) and(
+            <if test="category1Id!=0 and category1Id != null and category1Id != ''">
+                 (bai.category_id = #{category1Id} AND bai.category_level = 1)
+            </if>
+            <if test="category2Id!=0 and category2Id != null and category2Id != ''">
+                OR (bai.category_id = #{category2Id} AND bai.category_level = 2)
+            </if>
+            <if test="category3Id!=0 and category3Id != null and category3Id != ''">
+                OR (bai.category_id = #{category3Id} AND bai.category_level = 3)
+            </if>
+                )
+        </where>
+    </select>
+
+<!--    List<BaseAttrInfo> getAttrListBySkuId(Long skuId); -->
+    <resultMap autoMapping="true" id="baseInfoBySku" type="com.arzhu.sph_gmall.model.product.BaseAttrInfo">
+        <id column="id" property="id"></id>
+        <collection autoMapping="true" property="attrValueList" ofType="com.arzhu.sph_gmall.model.product.BaseAttrValue">
+            <id column="attr_value_id" property="id"></id>
+        </collection>
+    </resultMap>
+    <select id="getAttrListBySkuId" resultMap="baseInfoBySku">
+        SELECT
+            bai.id id,
+            bai.attr_name attr_name,
+            bai.category_id category_id,
+            bai.category_level category_level,
+            bav.id attr_value_id,
+            bav.value_name value_name,
+            bai.id attr_id
+        FROM sku_attr_value  sav
+                 JOIN base_attr_info bai ON sav.attr_id = bai.id
+                 JOIN base_attr_value bav ON sav.value_id = bav.id
+        WHERE sav.sku_id = #{skuId};
+    </select>
+</mapper>

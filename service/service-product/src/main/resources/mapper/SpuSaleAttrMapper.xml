@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.arzhu.sph_gmall.product.mapper.SpuSaleAttrMapper">
+    <!--    List<SpuSaleAttrValue> getSpuSaleAttrListCheckBySku(@Param("skuId") Long skuId, @Param("spuId") Long spuId);-->
+
+
+    <resultMap autoMapping="true" id="saleAttrListCheckList" type="com.arzhu.sph_gmall.model.product.SpuSaleAttr">
+        <id column="id" property="id"></id>
+        <collection autoMapping="true" property="spuSaleAttrValueList" ofType="com.arzhu.sph_gmall.model.product.SpuSaleAttrValue">
+            <id column="sale_attr_value_id" property="id"></id>
+        </collection>
+    </resultMap>
+    <select id="getSpuSaleAttrListCheckBySku" resultMap="saleAttrListCheckList">
+        SELECT
+            p_ssa.id,
+            p_ssa.spu_id,
+            p_ssa.sale_attr_name,
+            p_ssav.id sale_attr_value_id,
+            p_ssav.sale_attr_value_name,
+            k_ssav.sku_id,
+            IF(k_ssav.sku_id IS NULL,0,1) is_checked
+        FROM spu_sale_attr p_ssa
+                 JOIN spu_sale_attr_value p_ssav
+                      ON p_ssa.spu_id = p_ssav.spu_id and p_ssa.base_sale_attr_id = p_ssav.base_sale_attr_id
+                 LEFT JOIN sku_sale_attr_value k_ssav
+                           ON p_ssav.id = k_ssav.sale_attr_value_id and k_ssav.sku_id = #{skuId}
+        WHERE p_ssa.spu_id = #{spuId}
+        ORDER BY p_ssa.base_sale_attr_id,p_ssa.id
+    </select>
+
+</mapper>
